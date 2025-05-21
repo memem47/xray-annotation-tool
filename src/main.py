@@ -18,6 +18,7 @@ import cv2
 import numpy as np
 from PIL import Image, ImageTk
 
+from synthetic_xray import generate_phantom
 
 class AnnotationApp(tk.Tk):
     """Main application window."""
@@ -73,11 +74,9 @@ class AnnotationApp(tk.Tk):
 
     def _generate_sim(self) -> None:
         """Create a quick synthetic phantom (512×512)"""
-        size = 512
-        img = self._create_simulated_xray(size)
-        self.image = img
-        self.img_path = None  # synthetic
-        self._display_image(img)
+        self.image = generate_phantom(size=512)
+        self.img_path = None
+        self._display_image(self.image)
 
     # ------------------------------------------------------------------ drawing helpers
     def _display_image(self, img: np.ndarray) -> None:
