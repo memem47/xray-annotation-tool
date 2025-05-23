@@ -63,6 +63,9 @@ def generate_phantom(
         intensity = rng.integers(20, 40),
     )
 
+    # 2-c) collimater
+    img = _apply_collimator(img)
+
     # 3) soft global blutr to mimic scatter
     cv2.GaussianBlur(img, (0, 0), sigmaX=size * 0.01, dst=img)
 
@@ -97,3 +100,17 @@ def _bezier(ctrl_pts: np.ndarray, t: np.ndarray) -> np.ndarray:
         math.comb(n, k) * ((1 - t) ** (n - k)) * (t ** k) for k in range(n + 1)
     ]
     return np.tensordot(np.array(coeff).T, ctrl_pts, axes=1)
+
+def _apply_collimator(img: np.ndarray, margin_pct: Tuple[float, float]=(0.1,0.2)) -> np.ndarray:
+    h, w = img.shape
+    rng = np.random.default_rng()
+    ml = rng.uniform(*margin_pct)
+    mt = rng.uniform(*margin_pct)
+    mr = rng.uniform(*margin_pct)
+    mb = rng.uniform(*margin_pct)
+    x0, x1 = int(w*ml), int(w*(1-mr))
+    y0, y1 = int(h*mt), int(h*(1-mb))
+    mask = np.zeros_like(img)
+    mask[y0:y1, x0:x1] = 1
+    img = img * mask
+    return img
